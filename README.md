@@ -48,6 +48,10 @@ docker-compose up -d
 
 2. Start the taskiq worker (consumer):
 ```bash
+taskiq worker tasks:broker
+```
+Or alternatively:
+```bash
 python consumer.py
 ```
 
