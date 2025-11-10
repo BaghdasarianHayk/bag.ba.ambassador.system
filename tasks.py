@@ -1,6 +1,5 @@
 import logging
 from aiogram import Bot
-from taskiq import TaskiqRetry
 from taskiq_aio_pika import AioPikaBroker
 
 from config import (
