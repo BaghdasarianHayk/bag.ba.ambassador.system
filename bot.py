@@ -1,12 +1,8 @@
-import asyncio
-import time
 import logging
 
-from aiogram import Bot, Dispatcher, types
-from aiogram.filters import Command
+from aiogram import Bot, Dispatcher
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
-from aio_pika import connect_robust, Message
 
 from config import (
     BOT_TOKEN,
@@ -14,44 +10,13 @@ from config import (
     WEBHOOK_PATH,
     WEBAPP_HOST,
     WEBAPP_PORT,
-    get_rabbitmq_url,
     configure_logging,
-    MQ_ROUTING_KEY,
 )
 
 log = logging.getLogger(__name__)
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
-
-
-async def publish_message_to_rabbitmq(message_text: str):
-    """Publish a message to RabbitMQ"""
-    connection = await connect_robust(get_rabbitmq_url())
-    
-    async with connection:
-        channel = await connection.channel()
-        queue = await channel.declare_queue(MQ_ROUTING_KEY)
-        
-        await channel.default_exchange.publish(
-            Message(body=message_text.encode()),
-            routing_key=MQ_ROUTING_KEY,
-        )
-        log.info("Published message to RabbitMQ: %s", message_text)
-
-
-@dp.message(Command("start"))
-async def cmd_start(message: types.Message):
-    """Handle /start command - publish a message to RabbitMQ"""
-    message_body = f"Hello World from {time.time()}"
-    
-    try:
-        await publish_message_to_rabbitmq(message_body)
-        await message.answer(f"✅ Message published to RabbitMQ:\n{message_body}")
-        log.warning("Published message via bot: %s", message_body)
-    except Exception as e:
-        log.error("Failed to publish message: %s", e)
-        await message.answer(f"❌ Failed to publish message: {e}")
 
 
 async def on_startup():

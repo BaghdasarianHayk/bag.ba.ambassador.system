@@ -33,24 +33,35 @@ python bot.py
 ## Components
 
 - `publisher.py` - Standalone message publisher
-- `consumer.py` - Message consumer that sends messages to Telegram user
-- `bot.py` - Telegram bot with webhook that publishes messages on /start command
-- `api.py` - FastAPI server with endpoint to publish messages to RabbitMQ
+- `consumer.py` - Taskiq worker that processes tasks
+- `tasks.py` - Taskiq tasks definition (send Telegram messages)
+- `bot.py` - Telegram bot with webhook (minimal setup)
+- `api.py` - FastAPI server with endpoint to queue tasks
 - `config.py` - Configuration file
 
-## API Usage
+## Running the Application
 
-Start the FastAPI server:
+1. Start RabbitMQ:
+```bash
+docker-compose up -d
+```
+
+2. Start the taskiq worker (consumer):
+```bash
+python consumer.py
+```
+
+3. Start the FastAPI server:
 ```bash
 python api.py
 ```
 
-Send a message via API:
+4. Send a message via API:
 ```bash
 curl -X POST http://localhost:8000/send-message \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello from API!"}'
 ```
 
-The consumer will receive the message and send it to the configured Telegram user.
+The taskiq worker will process the task and send the message to the configured Telegram user.
 

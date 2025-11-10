@@ -1,13 +1,9 @@
 import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from aio_pika import connect_robust, Message
 
-from config import (
-    get_rabbitmq_url,
-    configure_logging,
-    MQ_ROUTING_KEY,
-)
+from config import configure_logging
+from tasks import send_telegram_message
 
 log = logging.getLogger(__name__)
 
@@ -20,24 +16,20 @@ class MessageRequest(BaseModel):
 
 @app.post("/send-message")
 async def send_message(request: MessageRequest):
-    """Send a message to RabbitMQ queue"""
+    """Send a message via taskiq to Telegram"""
     try:
-        connection = await connect_robust(get_rabbitmq_url())
+        # Kick off the task asynchronously
+        task = await send_telegram_message.kiq(request.text)
         
-        async with connection:
-            channel = await connection.channel()
-            await channel.declare_queue(MQ_ROUTING_KEY)
-            
-            await channel.default_exchange.publish(
-                Message(body=request.text.encode()),
-                routing_key=MQ_ROUTING_KEY,
-            )
-            
-            log.info("Published message to RabbitMQ: %s", request.text)
-            return {"status": "success", "message": f"Message sent: {request.text}"}
+        log.info("Queued message task: %s", request.text)
+        return {
+            "status": "success",
+            "message": f"Message queued: {request.text}",
+            "task_id": task.task_id
+        }
     
     except Exception as e:
-        log.error("Failed to publish message: %s", e)
+        log.error("Failed to queue message: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
