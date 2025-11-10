@@ -1,6 +1,6 @@
 import logging
 
-RMQ_HOST = "0.0.0.0"
+RMQ_HOST = "localhost"
 RMQ_PORT = 5672
 
 RMQ_USER = "guest"
