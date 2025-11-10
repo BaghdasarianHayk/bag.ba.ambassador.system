@@ -11,6 +11,7 @@ MQ_ROUTING_KEY = "news"
 
 # Telegram Bot Configuration
 BOT_TOKEN = "8497899812:AAEO3PabXI5NPLkDLLo2yR6bNIF01XgUCgc"
+TELEGRAM_USER_ID = 123456789  # Replace with your Telegram user ID
 WEBHOOK_HOST = "https://owkya-78-109-72-68.a.free.pinggy.link"
 WEBHOOK_PATH = "/bots/webhook"
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
@@ -18,6 +19,10 @@ WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 # Webhook server configuration
 WEBAPP_HOST = "0.0.0.0"
 WEBAPP_PORT = 8080
+
+# FastAPI server configuration
+API_HOST = "0.0.0.0"
+API_PORT = 8000
 
 
 def get_rabbitmq_url() -> str:

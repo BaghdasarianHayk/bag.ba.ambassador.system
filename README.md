@@ -33,7 +33,24 @@ python bot.py
 ## Components
 
 - `publisher.py` - Standalone message publisher
-- `consumer.py` - Message consumer
+- `consumer.py` - Message consumer that sends messages to Telegram user
 - `bot.py` - Telegram bot with webhook that publishes messages on /start command
+- `api.py` - FastAPI server with endpoint to publish messages to RabbitMQ
 - `config.py` - Configuration file
+
+## API Usage
+
+Start the FastAPI server:
+```bash
+python api.py
+```
+
+Send a message via API:
+```bash
+curl -X POST http://localhost:8000/send-message \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello from API!"}'
+```
+
+The consumer will receive the message and send it to the configured Telegram user.
 
